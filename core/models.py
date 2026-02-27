@@ -13,12 +13,12 @@ class Landmark(models.Model):
 
 # جدول المفضلة
 class Favorite(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    landmark = models.ForeignKey("Landmark", on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE) # ربط المفضلة بالمستخدم
+    landmark = models.ForeignKey("Landmark", on_delete=models.CASCADE) # ربط المفضلة بالمعلم السياحي
+    created_at = models.DateTimeField(auto_now_add=True) # تاريخ إضافة المعلم إلى المفضلة
 
     class Meta:
-        unique_together = ('user', 'landmark')
+        unique_together = ('user', 'landmark') # التأكد من أن المستخدم لا يمكنه إضافة نفس المعلم إلى المفضلة أكثر من مرة
 
     def __str__(self):
         return f"{self.user.username} - {self.landmark.Landmark_Name}"
