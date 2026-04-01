@@ -42,11 +42,18 @@
                 <a class="nav-link" href="#about"><i class="bi bi-exclamation-circle-fill"></i> About</a>
             </li>
         </ul>
-        
+        {% if user.is_authenticated %}
         <div class="user-info">
             <hr>
-            <a class="profile-link" href="/profile/"><i class="bi bi-person-fill"></i> Welcome {Mohammad}{{user.username}}</a>
-            <button class="btn btn-outline-danger logout-btn">Log Out <i class="bi bi-box-arrow-right"></i></button>
+            <a class="profile-link" href="/profile/"><i class="bi bi-person-fill"></i> Welcome {{user.username}}</a>
+            
+            <form action="{% url 'logout' %}" method="post">
+                {% csrf_token %}
+                <button class="btn btn-outline-danger logout-btn">
+                    Log Out <i class="bi bi-box-arrow-right"></i>
+                </button>
+            </form>
         </div>
+        {% endif %}
     </div>
 </div>

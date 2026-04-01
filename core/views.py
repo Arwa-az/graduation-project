@@ -1,6 +1,13 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
-from .models import Landmark
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
+from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login as auth_login, logout
+from django.contrib import messages
+from .models import Landmark, Favorite, Story
+from django.db.models import Q
 import os
 import joblib
 import numpy as np
@@ -13,34 +20,160 @@ from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 # Create your views here.
 def home(request):
     return render(request, 'frontend/home.html', {
-        'is_login': False
+        'is_login': request.user.is_authenticated
     })
 def explore(request):
     return render(request, 'frontend/explore.html',{
-        'is_login': False
+        'is_login': request.user.is_authenticated
     })
 def exploreResult(request):
-    return render(request, 'frontend/exploreResult.html',{
-        'is_login': False
+    query = request.GET.get('q', '') #the one we used as name
+
+    landmark = None
+    top_landmarks = []
+    related_landmarks = [] # it will be by reigon since we have reigon filter
+    results = []
+    #to get information from db
+    if query and len(query) >= 3: # limit length to avoide large scale saerching
+        results = Landmark.objects.filter(
+            #we used icontains to "NOT" make the search case sensitive
+            Q(Landmark_Name__icontains=query) | Q(Description__icontains=query)
+        )
+#
+        if results.count() == 1:
+            landmark = results.first() # if there is one result
+        elif results.exists():
+            top_landmarks = results # if there is more than one result
+        else:
+            # if there is no results, related landmarks will be displayed
+            related_landmarks = Landmark.objects.all()[:3]
+
+    return render(request, 'frontend/exploreResult.html', {
+        'landmark': landmark,
+        'top_landmarks': top_landmarks,
+        'related_landmarks': related_landmarks,
+        'query': query,
+        'is_login': request.user.is_authenticated
     })
 def infoPlace(request, landmark_id):
-    # Fetch the landmark details using the provided landmark_id
+    # to fetch the landmark details using the provided landmark_id
     place = get_object_or_404(Landmark, id=landmark_id)
+    
+    #to check if this landmark is favorited by the user
+    is_favorite = False
+    if request.user.is_authenticated:
+        is_favorite = Favorite.objects.filter(
+            user=request.user,
+            landmark=place
+        ).exists()
+    
+     #to handle comment submission
+    if request.user.is_authenticated and request.method == "POST":
+        comment_content = request.POST.get("comment")  # match the input's name in template
+        if comment_content:
+            from .models import Story  # make sure Story model exists
+            Story.objects.create(user=request.user, landmark=place, content=comment_content)
+        return redirect('infoPlace', landmark_id=landmark_id)  # refresh page to show new comment
+    
+    #to get all comments for this landmark to be displayed
+    stories = place.story_set.order_by('-created_at')  # newest first
+
+
     return render(request, 'frontend/InfoPlace.html', {
         'place': place,
-        'is_login': True
-    })
-def profile(request):
-    return render(request, 'frontend/profile.html',{
-        'is_login': True
+        'is_login': request.user.is_authenticated,
+        'is_favorite': is_favorite,
+        'stories': stories,        
     })
 
-#registeration:
+@login_required
+def profile(request):
+    user = request.user
+    # Get all landmarks this user has favorited + the comments they shared
+    favorites = Favorite.objects.filter(user=user).select_related('landmark')
+    user_stories = Story.objects.filter(user=user).order_by('-created_at')
+
+    context = {
+        'favorites': [f.landmark for f in favorites],  # only the Landmark objects
+        'user_stories': user_stories,
+    }
+    return render(request, 'frontend/profile.html', context)
+
 def register(request):
-    return render(request, 'account/register.html')
+
+    if request.method == "POST":
+
+        first_name  = request.POST.get("first_name")
+        username = request.POST.get("username")
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+
+        # if username already exists
+        if User.objects.filter(username=username).exists():
+            messages.error(request, "Username already exists.")
+            return render(request, "account/register.html")
+
+        # to do Email check
+        if User.objects.filter(email=email).exists():
+            messages.error(request, "Email already registered.")
+            return render(request, "account/register.html")
+        
+        # password rules
+        try:
+            validate_password(password)
+        except ValidationError as e:
+            for error in e:
+                messages.error(request, error)
+            return render(request, "account/register.html")
+        
+        # create user
+        user = User.objects.create_user(
+            first_name=first_name,
+            username=username,
+            email=email,
+            password=password
+        )
+
+        messages.success(request, "Account created successfully. Please login.")
+        return redirect("/login/")
+
+    return render(request, "account/register.html")
 
 def login(request):
-    return render(request, 'account/login.html')
+
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            auth_login(request, user)
+            return redirect("/")
+
+        else:
+            messages.error(request, "Invalid username or password.")
+
+    return render(request, "account/login.html")
+
+def logout_view(request):
+    logout(request)
+    return redirect("/")
+
+@login_required
+@login_required
+def toggle_favorite(request, landmark_id):
+    landmark = get_object_or_404(Landmark, id=landmark_id)
+    favorite_obj = Favorite.objects.filter(user=request.user, landmark=landmark).first()
+
+    if favorite_obj:
+        # Already favorited -> remove it
+        favorite_obj.delete()
+    else:
+        # Not favorited -> add it
+        Favorite.objects.create(user=request.user, landmark=landmark)
+
+    return redirect('infoPlace', landmark_id=landmark.id)
 
 #admin dashboard:
 def dashboard(request):
@@ -110,5 +243,5 @@ def predict_landmark(request):
         'landmark': landmark,
         'top_landmarks': top_landmarks,
         'error': error_msg,
-        'is_login': False
+        'is_login': request.user.is_authenticated
     })

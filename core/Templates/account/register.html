@@ -30,7 +30,15 @@
             <div class="col-12 col-sm-6 d-flex justify-content-center align-items-center"> <!-- form side -->
                 <div class="form-container text-center justify-content-center slide-right">
                     <h1>Welcome To Saudi Tales &hearts;</h1>
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-warning">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
                     <form method="post">
+                        {% csrf_token %}
                         <input type="text" name="name" placeholder="Enter your name" required>
                         <input type="text" name="username" placeholder="Enter username" required>
                         <input type="email" name="email" placeholder="Enter your email" required>

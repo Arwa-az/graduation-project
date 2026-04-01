@@ -1,4 +1,4 @@
-{% if is_login %}
+{% if user.is_authenticated  %}
     {% include "includes/header_reg.html" %}
 {% else %}
     {% include "includes/header_visitor.html" %}

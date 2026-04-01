@@ -20,6 +20,7 @@
 </head>
 
 <body>
+    <!--
     <div class="log-modal" id="modal-logout">
         <div class="modal-logout-cotent">
             <h4>Are you sure you want to log out?</h4>
@@ -27,6 +28,30 @@
                 <button class="yes-btn"><a href="/" style="color: #F6F1E7 ;">Yes</a></button>
                 <button class="no-btn" id="close-log-modal">No</button>
             </div>
+        </div>
+    </div>
+-->
+    <!-- this is to activate the logout pop-up -->
+    <div class="log-modal" id="modal-logout">
+        <div class="modal-logout-cotent">
+            <h4>Are you sure you want to log out?</h4>
+
+            <form action="{% url 'logout' %}" method="post">
+                {% csrf_token %}
+
+                <div class="logout-actions">
+                    <!-- YES = ACTUAL LOGOUT -->
+                    <button type="submit" class="yes-btn">
+                        Yes
+                    </button>
+
+                    <!-- NO = CLOSE POPUP -->
+                    <button type="button" class="no-btn" id="close-log-modal">
+                        No
+                    </button>
+                </div>
+            </form>
+
         </div>
     </div>
     {% include "includes/header.html" %}

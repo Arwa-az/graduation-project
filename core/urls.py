@@ -10,6 +10,7 @@ urlpatterns = [
     #registeration:
     path('register/', views.register, name='register'),
     path('login/', views.login, name='login'),
+    path("logout/", views.logout_view, name="logout"),
 
     #admin dashboard:
     path('dashboard/', views.dashboard, name='dashboard'),
@@ -20,5 +21,5 @@ urlpatterns = [
     path('predict/', views.predict_landmark, name='predict_landmark'),
 
     path('infoPlace/<int:landmark_id>/', views.infoPlace, name='infoPlace'),
-
+    path('toggle_favorite/<int:landmark_id>/', views.toggle_favorite, name='toggle_favorite'),
 ]

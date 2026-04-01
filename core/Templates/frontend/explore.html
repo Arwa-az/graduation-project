@@ -7,10 +7,10 @@
         <h5 class="explore-title">Explore Landmarks easily using text search or by uploading an image of a landmark</h5>
         <!-- manual search -->
         <div class="row my-4">
-            <form action="/exploreResult/" method="get" class="search-form">
+            <form action="{% url 'exploreResult' %}" method="get" class="search-form">
                 <div class="col-auto manual-search align-items-center gap-3 d-flex flex-warp">
                     <!-- search text -->
-                    <input type="search" class="form-control" placeholder="Search for landmarks...">
+                    <input type="search" name="q" class="form-control" placeholder="Search for landmarks..." required>
                     <!-- custom dropdown -->
                     <div class="custom-select">
                         <button class="filter-btn dropdown-toggle" type="button" data-bs-toggle="dropdown">

@@ -12,9 +12,23 @@
             <div class="col-12 col-md-6"> <!--place information-->
                 <div class="place-header d-flex">
                     <h5 class="place-name">{{ place.Landmark_Name }}</h5>
-                    <button class="like-btn">
-                        <i class="bi bi-heart"></i>
-                    </button>
+                    {% if user.is_authenticated %}
+                        <form method="POST" action="{% url 'toggle_favorite' place.id %}">
+                            {% csrf_token %}
+
+                            <button type="submit"
+                                class="btn like-btn {% if is_favorite %}btn-danger{% else %}btn-outline-danger{% endif %}">
+                                
+                                <i class="bi {% if is_favorite %}bi-heart-fill{% else %}bi-heart{% endif %}"></i>
+                                
+                            </button>
+
+                        </form>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="btn btn-outline-danger like-btn">
+                            <i class="bi bi-heart"></i>
+                        </a>
+                    {% endif %}
                     <button class="share-btn">
                         <i class="bi bi-upload"></i>
                     </button>
@@ -30,52 +44,60 @@
             <!-- if user is registered -->
             <div class="col">
                 <h5 class="title">Users Comments</h5>
-                <div class="comment-box p-3 mb-3">
-                    <p class="comment-text">⭐ This place is amazing! I loved exploring the history and architecture of
-                        the
-                        Masmak Fortress. A must-visit for anyone interested in Saudi heritage.</p>
-                    <p class="comment-text">⭐ This place is amazing! I loved exploring the history and architecture of
-                        the
-                        Masmak Fortress. A must-visit for anyone interested in Saudi heritage.</p>
-                    <p class="comment-text">⭐ This place is amazing! I loved exploring the history and architecture of
-                        the
-                        Masmak Fortress. A must-visit for anyone interested in Saudi heritage.</p>
-                    <p class="comment-text">⭐ This place is amazing! I loved exploring the history and architecture of
-                        the
-                        Masmak Fortress. A must-visit for anyone interested in Saudi heritage.</p>
-                    <!-- add comments text -->
-                    <div class="text-comment d-flex align-items-center justify-content-center">
-                        <input type="text" class="form-control mt-0" placeholder="What do you think?"><button
-                            class="submit"><i class="bi bi-arrow-up-circle"></i></button>
+                {% if user.is_authenticated %}
+                    <div class="comment-box p-3 mb-3">
+                            <!--to get the comments from DB-->
+                            {% for story in stories %}
+                            <p class="comment-text">
+                                ⭐ {{ story.user.first_name|default:story.user.username }}:
+                                {{ story.content }}
+                            </p>
+                        {% empty %}
+                            <p>No comments yet.</p>
+                        {% endfor %}
+
+                        <!--to write comments-->
+                        <form method="POST">
+                            {% csrf_token %}
+                            <div class="text-comment d-flex align-items-center justify-content-center">
+                                <input type="text"
+                                    name="comment"
+                                    class="form-control"
+                                    placeholder="What do you think?"
+                                    required>
+                                <button type="submit" class="submit">
+                                    <i class="bi bi-arrow-up-circle"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                {% else %}
+                <!-- elif user is visitor  -->
+                <div class="col locked-comments">
+                    <div class="comment-box blurred p-3 mb-3">
+                        <p class="comment-text">⭐ This place is amazing! I loved exploring the history and architecture of
+                            the
+                            Masmak Fortress. A must-visit for anyone interested in Saudi heritage.</p>
+                        <p class="comment-text">⭐ This place is amazing! I loved exploring the history and architecture of
+                            the
+                            Masmak Fortress. A must-visit for anyone interested in Saudi heritage.</p>
+                        <p class="comment-text">⭐ This place is amazing! I loved exploring the history and architecture of
+                            the
+                            Masmak Fortress. A must-visit for anyone interested in Saudi heritage.</p>
+                        <p class="comment-text">⭐ This place is amazing! I loved exploring the history and architecture of
+                            the
+                        <!-- add comments text -->
+                        <div class="text-comment d-flex align-items-center justify-content-center">
+                            <input type="text" class="form-control mt-0" placeholder="What do you think?"><button
+                                class="submit"><i class="bi bi-arrow-up-circle"></i></button>
+                        </div>
+                    </div>
+                    <div class="locked-overly">
+                        <p>Sign Up to see all users comments and stories!</p>
                     </div>
                 </div>
+                {% endif %}
             </div>
-            <!-- elif user is visitor  -->
-            <div class="col locked-comments">
-                <h5 class="title">Users Comments</h5>
-                <div class="comment-box blurred p-3 mb-3">
-                    <p class="comment-text">⭐ This place is amazing! I loved exploring the history and architecture of
-                        the
-                        Masmak Fortress. A must-visit for anyone interested in Saudi heritage.</p>
-                    <p class="comment-text">⭐ This place is amazing! I loved exploring the history and architecture of
-                        the
-                        Masmak Fortress. A must-visit for anyone interested in Saudi heritage.</p>
-                    <p class="comment-text">⭐ This place is amazing! I loved exploring the history and architecture of
-                        the
-                        Masmak Fortress. A must-visit for anyone interested in Saudi heritage.</p>
-                    <p class="comment-text">⭐ This place is amazing! I loved exploring the history and architecture of
-                        the
-                    <!-- add comments text -->
-                    <div class="text-comment d-flex align-items-center justify-content-center">
-                        <input type="text" class="form-control mt-0" placeholder="What do you think?"><button
-                            class="submit"><i class="bi bi-arrow-up-circle"></i></button>
-                    </div>
-                </div>
-                <div class="locked-overly">
-                    <p>Sign Up to see all users comments and stories!</p>
-                </div>
-            </div>
-        </div>
     </div>
 </section>
 {% endblock content %}
