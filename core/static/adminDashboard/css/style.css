@@ -115,7 +115,6 @@ ul {
 #top-navbar {
     height: 70px;
     background: #EDE3CC;
-    border-bottom: 1px solid #0B5D3B;
     padding: 0px 20px;
     margin-left: 250px;
     width: calc(100% - 250px);
@@ -280,4 +279,13 @@ table tr{
     justify-content: center;
     align-items: center;
     padding: 10px;
+}
+/* account page */
+.add-user-btn{
+    background-color: #0B5D3B;
+    color: #F6F1E7;
+    font-size: 18px;
+    padding: 10px;
+    border: none;
+    border-radius: 20px;
 }

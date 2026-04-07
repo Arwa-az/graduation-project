@@ -989,6 +989,10 @@ a {
   border-radius: 20px;
 }
 
+.comment-box p{
+  border-bottom: #2e2e2e81 1px solid;
+}
+
 .locked-comments {
   position: relative;
   min-height: 350px; 
@@ -1176,16 +1180,41 @@ a {
 }
 
 /* profile edit icon */
-.user-sec .edit {
-  font-size: 1rem;
-  color: #0B5D3B;
-  cursor: pointer;
+.user-info-container {
+  position: relative;
 }
 
-.user-sec .setting {
+.user-info-container .edit-icon {
+  position: absolute;
+  top: 0;
+  right: 0;
   font-size: 1.5rem;
   color: #0B5D3B;
   cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.user-info-container .edit-icon:hover {
+  color: #084b30;
+  transform: scale(1.15);
+}
+/* edit modal */
+.modal-content{
+    background-color: #EDE3CC;
+}
+.modal-header{
+    color: #2e2e2e;
+    padding: 10px;
+}
+.modal-body form{
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+}
+.modal-footer{
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
 }
 
 /* logout pup window */
@@ -1197,6 +1226,11 @@ a {
   backdrop-filter: blur(4px);
   justify-content: center;
   align-items: center;
+  z-index: 1000;
+}
+
+.log-modal.show {
+  display: flex;
   z-index: 9999;
 }
 

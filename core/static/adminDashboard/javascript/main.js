@@ -188,7 +188,7 @@ const users = [
         name: "mohammad",
         email: "ahmm@gmail.com",
         accounttype: "user",
-        status: "active"
+        status: "1"
     },
     {
         id: 2,
@@ -196,7 +196,7 @@ const users = [
         name: "kalid",
         email: "kalid@gmail.com",
         accounttype: "user",
-        status: "blocked"
+        status: "0"
     },
     {
         id: 3,
@@ -204,13 +204,22 @@ const users = [
         name: "soosoo",
         email: "soo9443@gmail.com",
         accounttype: "admin",
-        status: "active"
+        status: "1"
+    },
+    {
+        id: 4,
+        username: "lololo44",
+        name: "looolo",
+        email: "lololo23@gmail.com",
+        accounttype: "admin",
+        status: "0"
     }
 ];
 
 // add the landmarks to the table:
 const bodyTable = document.getElementById("landmark-table")
 function renderTable() {
+    if (!bodyTable) return;
     bodyTable.innerHTML = ""
 
     landmarks.forEach((item, index) => {
@@ -222,47 +231,55 @@ function renderTable() {
     <td>${item.description}</td>
     <td><img src="${item.image}" alt="landmark image" width=50px height=50px ></td>
 
-    <td><button class="btn btn-danger deleteBtn" data-bs-toggle="modal" data-bs-target="#deletModal" data-index="${index}"><i class="bi bi-trash-fill"></i></button>
+    <td><button class="btn btn-danger deleteBtn" data-bs-toggle="modal" data-bs-target="#deleteLandmarkModal" data-index="${index}"><i class="bi bi-trash-fill"></i></button>
         <button class="btn btn-warning editBtn"  data-bs-toggle="modal" data-bs-target="#EditForm" data-index="${index}"><i class="bi bi-pencil-square"></i></button>
         </td>
     `
         bodyTable.appendChild(row)
     })
 }
-renderTable()
+if (bodyTable) renderTable()
 
 // delete landmark
 let deleteIndex = null;
 
-const deleteModal = document.getElementById("deletModal")
+const deleteModal = document.getElementById("deleteLandmarkModal")
+if (deleteModal) {
+    deleteModal.addEventListener("show.bs.modal", function (event) {
+        const button = event.relatedTarget
+        deleteIndex = button.getAttribute("data-index")
+    })
+}
 
-deleteModal.addEventListener("show.bs.modal", function (event) {
+function showToast(message, type = "success") {
+    const toastEl = document.getElementById("deleteToast")
+    if (!toastEl) return
 
-    const button = event.relatedTarget
+    toastEl.querySelector(".toast-body").textContent = message
+    toastEl.classList.remove("text-bg-success", "text-bg-danger", "text-bg-warning")
+    toastEl.classList.add(`text-bg-${type}`)
 
-    deleteIndex = button.getAttribute("data-index")
+    const toast = bootstrap.Toast.getOrCreateInstance(toastEl)
+    toast.show()
+}
 
-})
-// confirm the deleting
-document.getElementById("confirmDelete").addEventListener("click", function(){
-
-    if(deleteIndex !== null){
-
-        landmarks.splice(deleteIndex , 1)
-
-        renderTable()
-
-        const modal = bootstrap.Modal.getInstance(deleteModal)
-        modal.hide()
-
-    }
-
-})
-
+const confirmDeleteButton = document.getElementById("confirmDeleteLandmark")
+if (confirmDeleteButton && deleteModal) {
+    confirmDeleteButton.addEventListener("click", function () {
+        if (deleteIndex !== null) {
+            landmarks.splice(deleteIndex, 1)
+            renderTable()
+            const modal = bootstrap.Modal.getInstance(deleteModal)
+            modal.hide()
+            showToast("Landmark deleted successfully.", "success")
+        }
+    })
+}
 
 // add the users to the table:
 const tabbody = document.getElementById("user-table")
 function renderTable2() {
+    if (!tabbody) return;
     tabbody.innerHTML = ""
 
     users.forEach((item, index) => {
@@ -274,12 +291,71 @@ function renderTable2() {
     <td>${item.email}</td>
     <td>${item.accounttype}</td>
     <td>${item.status}</td>
-    <td><button class="btn btn-danger deleteBtn"><i class="bi bi-trash-fill"></i></button>
-                        <button class="btn btn-warning disableBtn">Disable</button>
-                        <button class="btn btn-success">Change</button>
+    <td><button class="btn btn-danger deleteBtn" data-bs-toggle="modal" data-bs-target="#deleteUserModal" data-index="${index}"><i class="bi bi-trash-fill"></i></button>
+                        <button class="btn btn-warning disableBtn" data-bs-toggle="modal" data-bs-target="#disableModal" data-index="${index}">Disable</button>
         </td>
     `
         tabbody.appendChild(row)
     })
 }
-renderTable2()
+if (tabbody) renderTable2()
+
+// delete user
+let deleteuser = null;
+
+const deleteUserModal = document.getElementById("deleteUserModal")
+if (deleteUserModal) {
+    deleteUserModal.addEventListener("show.bs.modal", function (event) {
+        const button = event.relatedTarget
+        deleteuser = button.getAttribute("data-index")
+    })
+}
+
+const confirmDeleteuser = document.getElementById("confirmDeleteUser")
+if (confirmDeleteuser && deleteUserModal) {
+    confirmDeleteuser.addEventListener("click", function () {
+        if (deleteuser !== null) {
+            users.splice(deleteuser, 1)
+            renderTable2()
+            const modal = bootstrap.Modal.getInstance(deleteUserModal)
+            modal.hide()
+            showToast("User deleted successfully.", "success")
+        }
+    })
+}
+
+// Search/Filter functionality for landmarks
+const landmarkSearchInput = document.getElementById("landmarkSearchInput")
+if (landmarkSearchInput) {
+    landmarkSearchInput.addEventListener("keyup", function () {
+        const searchText = this.value.toLowerCase()
+        const tableRows = document.querySelectorAll("#landmark-table tr")
+        
+        tableRows.forEach(row => {
+            const rowText = row.innerText.toLowerCase()
+            if (rowText.includes(searchText)) {
+                row.style.display = ""
+            } else {
+                row.style.display = "none"
+            }
+        })
+    })
+}
+
+// Search/Filter functionality for users
+const userSearchInput = document.getElementById("userSearchInput")
+if (userSearchInput) {
+    userSearchInput.addEventListener("keyup", function () {
+        const searchText = this.value.toLowerCase()
+        const tableRows = document.querySelectorAll("#user-table tr")
+        
+        tableRows.forEach(row => {
+            const rowText = row.innerText.toLowerCase()
+            if (rowText.includes(searchText)) {
+                row.style.display = ""
+            } else {
+                row.style.display = "none"
+            }
+        })
+    })
+}

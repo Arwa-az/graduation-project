@@ -6,7 +6,8 @@
 <h2 class="page-title">landmarks</h2>
 <div class="landmarks">
     <!-- add landmark button -->
-    <div class="d-flex align-items-end justify-content-end">
+    <div class="d-flex align-items-center justify-content-between gap-5">
+        <input type="search" id="landmarkSearchInput" class="form-control" placeholder="Search for landmarks...">
         <button class="add-land-btn" data-bs-toggle="modal" data-bs-target="#AddForm">Add Landmark</button>
     </div>
     <div class="table-box">
@@ -28,7 +29,7 @@
                     <td></td>
                     <td></td>
                     <td></td>
-                    <td><button class="btn btn-danger deleteBtn" data-bs-toggle="modal" data-bs-target="#deletModal"><i class="bi bi-trash-fill"></i></button>
+                    <td><button class="btn btn-danger deleteBtn" data-bs-toggle="modal" data-bs-target="#deleteLandmarkModal"><i class="bi bi-trash-fill"></i></button>
                         <button class="btn btn-warning editBtn" data-bs-toggle="modal" data-bs-target="#EditForm"><i
                                 class="bi bi-pencil-square"></i></button> -->
                     </td>
@@ -63,7 +64,7 @@
                             </div>
                             <div>
                                 <label for="imgInput" class="upload">Image: </label>
-                                <input type="file" id="imgInput" class="form-control">
+                                <input type="url" id="imgInput" class="form-control">
                             </div>
                         </div>
                     </form>
@@ -103,7 +104,7 @@
                             </div>
                             <div>
                                 <label for="imgInput" class="upload">Image: </label>
-                                <input type="file" id="edit_imgInput" class="form-control">
+                                <input type="url" id="edit_imgInput" class="form-control">
                             </div>
                         </div>
                     </form>
@@ -117,7 +118,7 @@
         </div>
     </div>
     <!-- pop alert for delete landmark -->
-    <div class="modal fade" id="deletModal">
+    <div class="modal fade" id="deleteLandmarkModal">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -130,7 +131,18 @@
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" data-bs-dismiss="modal">cancel</button>
-                    <button id="confirmDelete" class="btn btn-danger"><a>delete</a></button>
+                    <button id="confirmDeleteLandmark" class="btn btn-danger"><a>delete</a></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- deletion alert -->
+    <div aria-live="polite" aria-atomic="true" class="position-relative">
+        <div class="toast-container position-fixed bottom-0 end-0 p-3">
+            <div id="deleteToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body">Deletion completed.</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
                 </div>
             </div>
         </div>
