@@ -143,23 +143,24 @@
                 </div>
                 <!-- form body -->
                 <div class="modal-body">
-                    <form action="#" id="myEditForm">
+                    <form method="POST" id="myEditForm">
+                        {% csrf_token %}
                         <div class="inputField">
                             <div>
                                 <label for="distanation">Distanation: </label>
-                                <input type="text" id="edit_distanation" class="form-control">
+                                <input type="text" id="edit_distanation" name="Destination" class="form-control">
                             </div>
                             <div>
                                 <label for="name">Name: </label>
-                                <input type="text" id="edit_name" class="form-control">
+                                <input type="text" id="edit_name" name="Landmark_Name" class="form-control">
                             </div>
                             <div>
                                 <label for="description">Description: </label>
-                                <textarea id="edit_description" class="form-control"></textarea>
+                                <textarea id="edit_description" name="Description" class="form-control"></textarea>
                             </div>
                             <div>
                                 <label for="imgInput" class="upload">Image: </label>
-                                <input type="url" id="edit_imgInput" class="form-control">
+                                <input type="url" id="edit_imgInput" name="Image_Url" class="form-control">
                             </div>
                         </div>
                     </form>
@@ -229,7 +230,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 const imgTag = row.cells[4].querySelector("img");
                 editImage.value = imgTag ? imgTag.src : "";
 
-                document.getElementById("myEditForm").dataset.rowId = row.cells[0].textContent;
+                document.getElementById("myEditForm").action = `/update_landmark/${row.cells[0].textContent}/`;
             });
         }
 
@@ -264,70 +265,6 @@ document.addEventListener("DOMContentLoaded", function() {
         // Show "No landmarks" row if nothing matches
         const emptyRow = tableBody.querySelector("tr td[colspan='6']");
         if (emptyRow) emptyRow.parentElement.style.display = visibleCount ? "none" : "";
-    });
-
-    // --- Add landmark ---
-    const addForm = document.getElementById("myAddForm");
-    addForm.addEventListener("submit", function(e) {
-        e.preventDefault();
-
-        const destination = document.getElementById("destination").value.trim();
-        const name = document.getElementById("name").value.trim();
-        const description = document.getElementById("description").value.trim();
-        const imageUrl = document.getElementById("imgInput").value.trim();
-
-        if (!destination || !name) {
-            alert("Destination and Name are required");
-            return;
-        }
-
-        // Generate temporary ID
-        const newId = tableBody.rows.length ? parseInt(tableBody.rows[tableBody.rows.length - 1].cells[0].textContent) + 1 : 1;
-
-        // Create new row
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-            <td>${newId}</td>
-            <td>${destination}</td>
-            <td>${name}</td>
-            <td>${description}</td>
-            <td>${imageUrl ? `<img src="${imageUrl}" width="50" alt="${name}">` : "N/A"}</td>
-            <td>
-                <button class="btn btn-warning editBtn" data-bs-toggle="modal" data-bs-target="#EditForm">
-                    <i class="bi bi-pencil-square"></i>
-                </button>
-                <button class="btn btn-danger deleteBtn" data-bs-toggle="modal" data-bs-target="#deleteLandmarkModal">
-                    <i class="bi bi-trash-fill"></i>
-                </button>
-            </td>
-        `;
-        tableBody.appendChild(tr);
-
-        attachRowHandlers(tr);
-        addForm.reset();
-        bootstrap.Modal.getInstance(document.getElementById("AddForm")).hide();
-    });
-
-    // --- Edit landmark ---
-    const editForm = document.getElementById("myEditForm");
-    editForm.addEventListener("submit", function(e) {
-        e.preventDefault();
-
-        const rowId = editForm.dataset.rowId;
-        const row = Array.from(tableBody.rows).find(r => r.cells[0].textContent === rowId);
-        if (!row) return;
-
-        const newDestination = document.getElementById("edit_distanation").value.trim();
-        const newName = document.getElementById("edit_name").value.trim();
-        const newDescription = document.getElementById("edit_description").value.trim();
-        const newImage = document.getElementById("edit_imgInput").value.trim();
-
-        row.cells[1].textContent = newDestination;
-        row.cells[2].textContent = newName;
-        row.cells[3].textContent = newDescription;
-        row.cells[4].innerHTML = newImage ? `<img src="${newImage}" width="50" alt="${newName}">` : "N/A";
-
-        bootstrap.Modal.getInstance(document.getElementById("EditForm")).hide();
     });
 
     // --- Delete confirm ---

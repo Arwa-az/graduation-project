@@ -24,4 +24,9 @@ urlpatterns = [
     path('toggle_favorite/<int:landmark_id>/', views.toggle_favorite, name='toggle_favorite'),
     path('delete_landmark/<int:landmark_id>/', views.delete_landmark, name='delete_landmark'),
     path('add_landmark/', views.add_landmark, name='add_landmark'),
+    path('update_landmark/<int:landmark_id>/', views.update_landmark, name='update_landmark'),
+    path('add_user/', views.add_user, name='add_user'),
+    path('delete_user/<int:id>/', views.delete_user, name='delete_user'),
+    path('disable_user/<int:id>/', views.disable_user, name='disable_user'),
+    path('enable_user/<int:id>/', views.enable_user, name='enable_user'),
 ]

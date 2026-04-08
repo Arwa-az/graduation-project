@@ -255,7 +255,6 @@ def delete_landmark(request, landmark_id):
     if request.method == "POST":
         landmark = get_object_or_404(Landmark, id=landmark_id)
         landmark.delete()
-        messages.success(request, "Landmark deleted successfully!")
     return redirect('landmarks')
 @login_required
 def add_landmark(request):
@@ -271,15 +270,84 @@ def add_landmark(request):
             Description=description,
             Image_Url=image_url
         )
-        messages.success(request, "Landmark added successfully!")
-        
         return redirect('landmarks')
     return redirect('landmarks')
+@login_required
+def update_landmark(request, landmark_id):
+    landmark = get_object_or_404(Landmark, id=landmark_id)
+
+    if request.method == "POST":
+        #landmark = Landmark.objects.get(id=landmark_id)
+
+        landmark.Destination = request.POST.get("Destination")
+        landmark.Landmark_Name = request.POST.get("Landmark_Name")
+        landmark.Description = request.POST.get("Description")
+        landmark.Image_Url = request.POST.get("Image_Url")
+
+        landmark.save()
+
+        return redirect("landmarks")
+    return render(request, 'update_landmark.html', {'landmark': landmark})
 @login_required
 def accountMange(request):
     users = User.objects.all()
     return render(request, 'adminDashboard/AccountMang.html', {'users': users})
+@login_required
+def delete_user(request, id):
+    if request.method == "POST":
+        user = get_object_or_404(User, id=id)
 
+        if request.user == user:
+            messages.error(request, "You cannot delete your own account!")
+            return redirect('AccountManagement')
+
+        user.delete()
+    return redirect('AccountManagement')
+@login_required
+def disable_user(request, id):
+    if request.method == "POST":
+        user = get_object_or_404(User, id=id)
+
+        if request.user == user:
+            messages.error(request, "You cannot disable your own account!")
+            return redirect('AccountManagement')
+
+        user.is_active = False
+        user.save()
+    return redirect('AccountManagement')
+@login_required
+def enable_user(request, id):
+    if request.method == "POST":
+        user = get_object_or_404(User, id=id)
+        user.is_active = True
+        user.save()
+    return redirect('AccountManagement')
+@login_required
+def add_user(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        email = request.POST.get("email")
+
+        if User.objects.filter(username=username).exists():
+            messages.error(request, "Username already exists!")
+            return redirect('AccountManagement')
+
+        if User.objects.filter(email=email).exists():
+            messages.error(request, "Email already exists!")
+            return redirect('AccountManagement')
+
+        User.objects.create_user(
+            username=username,
+            email=email,
+            password="12345678", #temp password, will be changed later
+            first_name="Admin",
+            is_superuser=True,
+            is_staff=True 
+        )
+
+        messages.success(request, "User added successfully!")
+
+    return redirect('AccountManagement')
 # for download the MobileNet module once when running the server
 base_model = tf.keras.applications.MobileNetV2(weights='imagenet', include_top=False, pooling='avg')
 # Download the features from landmark_features.pkl file 

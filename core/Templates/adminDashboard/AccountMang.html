@@ -44,7 +44,7 @@
                             Disabled
                         {% endif %}
                     </td>
-                    <td><button class="btn btn-danger deleteBtn" data-id="{{ user.id }}">
+                    <td><button class="btn btn-danger deleteBtn" data-id="{{ user.id }}" data-bs-toggle="modal" data-bs-target="#deleteUserModal">
                             <i class="bi bi-trash-fill"></i>
                         </button>
                         {% if user.is_active %}
@@ -73,11 +73,12 @@
                 </div>
                 <!-- form body -->
                 <div class="modal-body">
-                    <form action="#" id="myAddusers">
+                    <form method="POST" action="{% url 'add_user' %}" id="myAddusers">
+                        {% csrf_token %}
                         <div class="inputField">
                             <div>
                                 <label for="userName">UserName: </label>
-                                <input type="text" id="userName" class="form-control">
+                                <input type="text" id="userName" name="username" class="form-control">
                             </div>
                             <div>
                                 <label for="name">Name: </label>
@@ -85,7 +86,7 @@
                             </div>
                             <div>
                                 <label for="email">Email: </label>
-                                <input type="email" id="email" class="form-control">
+                                <input type="email" id="email" name="email" class="form-control">
                             </div>
                             <div>
                                 <label for="accountType">Account Type: </label>
@@ -115,7 +116,7 @@
                 </div>
                 <div class="modal-body">
                     <p>
-                        Are you sure you want to delete the user {{user.username}}?
+                        Are you sure you want to delete the user?
                     </p>
                 </div>
                 <div class="modal-footer">
@@ -134,7 +135,7 @@
                 </div>
                 <div class="modal-body">
                     <p>
-                        Are you sure you want to disable the user {{user.username}}?
+                        Are you sure you want to disable the user?
                     </p>
                 </div>
                 <div class="modal-footer">
@@ -156,7 +157,12 @@
         </div>
     </div>
 </div>
-
+<form id="deleteUserForm" method="POST" style="display:none;">
+    {% csrf_token %}
+</form>
+<form id="statusForm" method="POST" style="display:none;">
+    {% csrf_token %}
+</form>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     const searchInput = document.getElementById("userSearchInput");
@@ -187,6 +193,37 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             }
         });
+    });
+});
+const deleteForm = document.getElementById("deleteUserForm");
+const confirmDeleteUser = document.getElementById("confirmDeleteUser");
+
+document.querySelectorAll(".deleteBtn").forEach(btn => {
+    btn.addEventListener("click", function() {
+        confirmDeleteUser.dataset.id = this.dataset.id;
+    });
+});
+
+confirmDeleteUser.addEventListener("click", function() {
+    const userId = this.dataset.id;
+    deleteForm.action = `/delete_user/${userId}/`;
+    deleteForm.submit();
+});
+const statusForm = document.getElementById("statusForm");
+
+document.querySelectorAll(".disableBtn").forEach(btn => {
+    btn.addEventListener("click", function() {
+        const userId = this.dataset.id;
+        statusForm.action = `/disable_user/${userId}/`;
+        statusForm.submit();
+    });
+});
+
+document.querySelectorAll(".enableBtn").forEach(btn => {
+    btn.addEventListener("click", function() {
+        const userId = this.dataset.id;
+        statusForm.action = `/enable_user/${userId}/`;
+        statusForm.submit();
     });
 });
 </script>
