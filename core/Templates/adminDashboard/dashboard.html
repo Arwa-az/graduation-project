@@ -67,5 +67,44 @@
     <div class="chart-card"><canvas id="featuredChart"></canvas></div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const ctx = document.getElementById('featuredChart').getContext('2d');
+
+    // Data from Django context
+    const destinations = {{ destinations|safe }};
+    const counts = {{ dest_counts|safe }};
+
+    new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: destinations,
+            datasets: [{
+                label: 'Landmarks per Destination',
+                data: counts,
+                backgroundColor: [
+                    '#FF6384', '#36A2EB', '#FFCE56', '#8BC34A', '#FF9800', 
+                    '#9C27B0', '#00BCD4', '#E91E63', '#CDDC39', '#607D8B'
+                ],
+                borderColor: '#fff',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                },
+                title: {
+                    display: true,
+                    text: 'Percentage of Landmarks by Destination'
+                }
+            }
+        }
+    });
+});
+</script>
 
 {% endblock content %}

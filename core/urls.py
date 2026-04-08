@@ -22,5 +22,6 @@ urlpatterns = [
 
     path('infoPlace/<int:landmark_id>/', views.infoPlace, name='infoPlace'),
     path('toggle_favorite/<int:landmark_id>/', views.toggle_favorite, name='toggle_favorite'),
-    path('delete-landmark/<int:landmark_id>/', views.delete_landmark, name='delete_landmark'),
+    path('delete_landmark/<int:landmark_id>/', views.delete_landmark, name='delete_landmark'),
+    path('add_landmark/', views.add_landmark, name='add_landmark'),
 ]

@@ -2,27 +2,20 @@
 {% load static %}
 {% block title %} Profile {% endblock title %}
 {% block content %}
-<div class="container fade-in">
+<div class="container">
     <!-- user information section -->
     <section class="user-sec">
         <div class="row">
             <!-- user image profile -->
-            <div class="col-12 col-md-2 d-flex align-items-center justify-content-center">
+            <div class="col-12 col-md-2 col-ms-2 d-flex align-items-center justify-content-center">
                 <img src="{% static 'frontend/Images/HeroImage.jpg' %}" alt="Profile Image" class="rounded-circle">
             </div>
             <!-- user information -->
-            <div class="col-12 col-md-4 text-center text-md-start">
+            <div class="col-12 col-md-4 col-ms-4 text-center text-md-start user-info-container">
                 <h5>{{user.first_name|default:user.username}}</h5>
                 <h5>@{{user.username}}</h5>
                 <h5>{{user.email}}</h5>
-            </div>
-            <div class="col-12 col-md-4 text-start text-md-start edit">
-                <!--<i class="bi bi-pencil-square"></i>-->
-                <i class="bi bi-pencil-square" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#editNameModal"></i>
-                <!-- the above updated code is to enable username editing-->
-            </div>
-            <div class="col-12 col-md-2 text-end text-md-end setting">
-                <i class="bi bi-gear-fill"></i>
+                <i class="bi bi-pencil-square edit-icon" data-bs-toggle="modal" data-bs-target="#EditingForm"></i>
             </div>
         </div>
     </section>
@@ -74,9 +67,59 @@
             </button>
         </form>
     </div>
+
+    <!-- edit user info form -->
+    <div class="modal fade" id="EditingForm">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <!-- form header -->
+                <div class="modal-header">
+                    <h2>Edit user information</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <!-- form body -->
+                <div class="modal-body">
+
+                    <!--this to show messages if the new name/email already exists-->
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-warning{% endif %}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="POST" action="{% url 'profile' %}" id="myEditingForm">
+                        {% csrf_token %}
+                        <div class="inputField">
+                            <div class="mb-3">
+                                <label for="edit_nameprofil">Name: </label>
+                                <input type="text" id="edit_nameprofil" name="first_name" class="form-control" value="{{ user.first_name }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="edit_userprofil">Username: </label>
+                                <input type="text" id="edit_userprofil" name="username" class="form-control" value="{{ user.username }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="edit_email">Email: </label>
+                                <input type="email" id="edit_email" name="email" class="form-control" value="{{ user.email }}">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <!-- form footer -->
+                <div class="modal-footer">
+                    <button class="btn btn-success" form="myEditingForm" type="submit">Save</button>
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
-<!--this is for updating the display name in profile page-->
+
+<!--
+this is for updating the display name in profile page
 <div class="modal fade" id="editNameModal">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -103,6 +146,17 @@
         </div>
     </div>
 </div>
+-->
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // If there are messages, open the modal automatically
+    const messagesExist = document.querySelectorAll('.alert').length > 0;
+    if (messagesExist) {
+        const myModal = new bootstrap.Modal(document.getElementById('EditingForm'));
+        myModal.show();
+    }
+});
+</script>
 
 {% endblock content %}

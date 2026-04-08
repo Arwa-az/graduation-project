@@ -6,7 +6,8 @@
 <h2 class="page-title">landmarks</h2>
 <div class="landmarks">
     <!-- add landmark button -->
-    <div class="d-flex align-items-end justify-content-end">
+    <div class="d-flex align-items-center justify-content-between gap-5">
+        <input type="search" id="landmarkSearchInput" class="form-control" placeholder="Search for landmarks...">
         <button class="add-land-btn" data-bs-toggle="modal" data-bs-target="#AddForm">Add Landmark</button>
     </div>
     <div class="table-box">
@@ -29,7 +30,7 @@
                     <td></td>
                     <td></td>
                     <td></td>
-                    <td><button class="btn btn-danger deleteBtn" data-bs-toggle="modal" data-bs-target="#deletModal"><i class="bi bi-trash-fill"></i></button>
+                    <td><button class="btn btn-danger deleteBtn" data-bs-toggle="modal" data-bs-target="#deleteLandmarkModal"><i class="bi bi-trash-fill"></i></button>
                         <button class="btn btn-warning editBtn" data-bs-toggle="modal" data-bs-target="#EditForm"><i
                                 class="bi bi-pencil-square"></i></button> -->
                     <td>{{ landmark.id }}</td>
@@ -47,7 +48,7 @@
                         <button class="btn btn-warning editBtn" data-bs-toggle="modal" data-bs-target="#EditForm" data-id="{{ landmark.id }}">
                             <i class="bi bi-pencil-square"></i>
                         </button>
-                        <button class="btn btn-danger deleteBtn" data-bs-toggle="modal" data-bs-target="#deletModal" data-id="{{ landmark.id }}">
+                        <button class="btn btn-danger deleteBtn" data-bs-toggle="modal" data-bs-target="#deleteLandmarkModal" data-id="{{ landmark.id }}">
                             <i class="bi bi-trash-fill"></i>
                         </button>
                     </td>
@@ -101,23 +102,24 @@
                 </div>
                 <!-- form body -->
                 <div class="modal-body">
-                    <form action="#" id="myAddForm">
+                    <form action="{% url 'add_landmark' %}" method="POST" id="myAddForm">
+                        {% csrf_token %}
                         <div class="inputField">
                             <div>
-                                <label for="distanation">Distanation: </label>
-                                <input type="text" id="distanation" class="form-control">
+                                <label for="destination">Destination: </label>
+                                <input type="text" id="destination" name="Destination" class="form-control">
                             </div>
                             <div>
                                 <label for="name">Name: </label>
-                                <input type="text" id="name" class="form-control">
+                                <input type="text" id="name" name="Landmark_Name" class="form-control">
                             </div>
                             <div>
                                 <label for="description">Description: </label>
-                                <textarea id="description" class="form-control"></textarea>
+                                <textarea id="description" name="Description" class="form-control"></textarea>
                             </div>
                             <div>
                                 <label for="imgInput" class="upload">Image: </label>
-                                <input type="file" id="imgInput" class="form-control">
+                                <input type="url" id="imgInput" name="Image_Url" class="form-control">
                             </div>
                         </div>
                     </form>
@@ -157,7 +159,7 @@
                             </div>
                             <div>
                                 <label for="imgInput" class="upload">Image: </label>
-                                <input type="file" id="edit_imgInput" class="form-control">
+                                <input type="url" id="edit_imgInput" class="form-control">
                             </div>
                         </div>
                     </form>
@@ -171,7 +173,7 @@
         </div>
     </div>
     <!-- pop alert for delete landmark -->
-    <div class="modal fade" id="deletModal">
+    <div class="modal fade" id="deleteLandmarkModal">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -184,11 +186,158 @@
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" data-bs-dismiss="modal">cancel</button>
-                    <button id="confirmDelete" class="btn btn-danger"><a>delete</a></button>
+                    <button id="confirmDeleteLandmark" class="btn btn-danger"><a>delete</a></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- deletion alert -->
+    <div aria-live="polite" aria-atomic="true" class="position-relative">
+        <div class="toast-container position-fixed bottom-0 end-0 p-3">
+            <div id="deleteToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body">Deletion completed.</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
                 </div>
             </div>
         </div>
     </div>
 </div>
+<form id="deleteForm" method="POST" style="display:none;">
+    {% csrf_token %}
+</form>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const searchInput = document.getElementById("landmarkSearchInput");
+    const tableBody = document.querySelector(".table-box tbody");
 
+    // --- Function to attach Edit/Delete handlers ---
+    function attachRowHandlers(row) {
+        const editBtn = row.querySelector(".editBtn");
+        const deleteBtn = row.querySelector(".deleteBtn");
+
+        if (editBtn) {
+            editBtn.addEventListener("click", function() {
+                const editDestination = document.getElementById("edit_distanation");
+                const editName = document.getElementById("edit_name");
+                const editDescription = document.getElementById("edit_description");
+                const editImage = document.getElementById("edit_imgInput");
+
+                editDestination.value = row.cells[1].textContent.trim();
+                editName.value = row.cells[2].textContent.trim();
+                editDescription.value = row.cells[3].textContent.trim();
+                const imgTag = row.cells[4].querySelector("img");
+                editImage.value = imgTag ? imgTag.src : "";
+
+                document.getElementById("myEditForm").dataset.rowId = row.cells[0].textContent;
+            });
+        }
+
+        if (deleteBtn) {
+            const confirmDelete = document.getElementById("confirmDeleteLandmark");
+            deleteBtn.addEventListener("click", function() {
+                confirmDelete.dataset.id = row.cells[0].textContent;
+            });
+        }
+    }
+
+    // Attach handlers to existing rows
+    document.querySelectorAll(".table-box tbody tr").forEach(attachRowHandlers);
+
+    // --- Search functionality ---
+    searchInput.addEventListener("keyup", function() {
+        const filter = searchInput.value.toLowerCase();
+        let visibleCount = 0;
+
+        tableBody.querySelectorAll("tr").forEach(row => {
+            if (row.cells.length < 3) return; // skip "No landmarks" rows
+            const destination = row.cells[1].textContent.toLowerCase();
+            const name = row.cells[2].textContent.toLowerCase();
+            if (destination.includes(filter) || name.includes(filter)) {
+                row.style.display = "";
+                visibleCount++;
+            } else {
+                row.style.display = "none";
+            }
+        });
+
+        // Show "No landmarks" row if nothing matches
+        const emptyRow = tableBody.querySelector("tr td[colspan='6']");
+        if (emptyRow) emptyRow.parentElement.style.display = visibleCount ? "none" : "";
+    });
+
+    // --- Add landmark ---
+    const addForm = document.getElementById("myAddForm");
+    addForm.addEventListener("submit", function(e) {
+        e.preventDefault();
+
+        const destination = document.getElementById("destination").value.trim();
+        const name = document.getElementById("name").value.trim();
+        const description = document.getElementById("description").value.trim();
+        const imageUrl = document.getElementById("imgInput").value.trim();
+
+        if (!destination || !name) {
+            alert("Destination and Name are required");
+            return;
+        }
+
+        // Generate temporary ID
+        const newId = tableBody.rows.length ? parseInt(tableBody.rows[tableBody.rows.length - 1].cells[0].textContent) + 1 : 1;
+
+        // Create new row
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>${newId}</td>
+            <td>${destination}</td>
+            <td>${name}</td>
+            <td>${description}</td>
+            <td>${imageUrl ? `<img src="${imageUrl}" width="50" alt="${name}">` : "N/A"}</td>
+            <td>
+                <button class="btn btn-warning editBtn" data-bs-toggle="modal" data-bs-target="#EditForm">
+                    <i class="bi bi-pencil-square"></i>
+                </button>
+                <button class="btn btn-danger deleteBtn" data-bs-toggle="modal" data-bs-target="#deleteLandmarkModal">
+                    <i class="bi bi-trash-fill"></i>
+                </button>
+            </td>
+        `;
+        tableBody.appendChild(tr);
+
+        attachRowHandlers(tr);
+        addForm.reset();
+        bootstrap.Modal.getInstance(document.getElementById("AddForm")).hide();
+    });
+
+    // --- Edit landmark ---
+    const editForm = document.getElementById("myEditForm");
+    editForm.addEventListener("submit", function(e) {
+        e.preventDefault();
+
+        const rowId = editForm.dataset.rowId;
+        const row = Array.from(tableBody.rows).find(r => r.cells[0].textContent === rowId);
+        if (!row) return;
+
+        const newDestination = document.getElementById("edit_distanation").value.trim();
+        const newName = document.getElementById("edit_name").value.trim();
+        const newDescription = document.getElementById("edit_description").value.trim();
+        const newImage = document.getElementById("edit_imgInput").value.trim();
+
+        row.cells[1].textContent = newDestination;
+        row.cells[2].textContent = newName;
+        row.cells[3].textContent = newDescription;
+        row.cells[4].innerHTML = newImage ? `<img src="${newImage}" width="50" alt="${newName}">` : "N/A";
+
+        bootstrap.Modal.getInstance(document.getElementById("EditForm")).hide();
+    });
+
+    // --- Delete confirm ---
+    const confirmDelete = document.getElementById("confirmDeleteLandmark");
+    const deleteForm = document.getElementById("deleteForm");
+    confirmDelete.addEventListener("click", function() {
+        const landmarkId = confirmDelete.dataset.id;
+        deleteForm.action = `/delete_landmark/${landmarkId}/`;
+        deleteForm.submit();
+    });
+});
+</script>
 {% endblock content %}

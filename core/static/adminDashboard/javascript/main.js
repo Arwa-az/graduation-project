@@ -106,16 +106,163 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 
+<<<<<<< HEAD
+=======
+// fake landmark data to see the table on frontend
+const landmarks = [
+    {
+        id: 1,
+        destination: "العلا",
+        name: "مدائن صالح",
+        description: "موقع أثري يعود لحضارة الأنباط ويعد من أبرز مواقع التراث العالمي.",
+        image: "https://via.placeholder.com/80"
+    },
+    {
+        id: 2,
+        destination: "الرياض",
+        name: "قصر المصمك",
+        description: "معلم تاريخي شهد توحيد المملكة ويعد رمزاً للتراث النجدي.",
+        image: "https://via.placeholder.com/80"
+    },
+    {
+        id: 3,
+        destination: "جدة",
+        name: "البلد التاريخية",
+        description: "منطقة تراثية تضم بيوتاً قديمة مبنية من الحجر المرجاني.",
+        image: "https://via.placeholder.com/80"
+    },
+    {
+        id: 4,
+        destination: "نجران",
+        name: "حي أبا السعود",
+        description: "حي تراثي يتميز بالعمارة الطينية التقليدية.",
+        image: "https://via.placeholder.com/80"
+    },
+    {
+        id: 5,
+        destination: "تبوك",
+        name: "عين السكر",
+        description: "موقع أثري يضم نقوشاً ورسومات صخرية قديمة.",
+        image: "https://via.placeholder.com/80"
+    },
+    {
+        id: 6,
+        destination: "حائل",
+        name: "جبة",
+        description: "منطقة تحتوي على نقوش صخرية تعود لآلاف السنين.",
+        image: "https://via.placeholder.com/80"
+    },
+    {
+        id: 7,
+        destination: "الطائف",
+        name: "سوق عكاظ",
+        description: "سوق تاريخي كان مركزاً للشعر والأدب في الجاهلية.",
+        image: "https://via.placeholder.com/80"
+    },
+    {
+        id: 8,
+        destination: "الأحساء",
+        name: "قصر إبراهيم",
+        description: "قلعة تاريخية تجمع بين الطراز الإسلامي والعثماني.",
+        image: "https://via.placeholder.com/80"
+    },
+    {
+        id: 9,
+        destination: "جازان",
+        name: "القرية التراثية",
+        description: "مجموعة مبانٍ تراثية تعكس تاريخ المنطقة وثقافتها.",
+        image: "https://via.placeholder.com/80"
+    },
+    {
+        id: 10,
+        destination: "القصيم",
+        name: "سوق المسوكف",
+        description: "سوق تراثي يعرض الصناعات اليدوية القديمة.",
+        image: "https://via.placeholder.com/80"
+    }
+];
+
+//fake user data to see the table on frontend 
+const users = [
+    {
+        id: 1,
+        username: "ahmadd94",
+        name: "mohammad",
+        email: "ahmm@gmail.com",
+        accounttype: "user",
+        status: "1"
+    },
+    {
+        id: 2,
+        username: "khali55d",
+        name: "kalid",
+        email: "kalid@gmail.com",
+        accounttype: "user",
+        status: "0"
+    },
+    {
+        id: 3,
+        username: "saraaaaa43",
+        name: "soosoo",
+        email: "soo9443@gmail.com",
+        accounttype: "admin",
+        status: "1"
+    },
+    {
+        id: 4,
+        username: "lololo44",
+        name: "looolo",
+        email: "lololo23@gmail.com",
+        accounttype: "admin",
+        status: "0"
+    }
+];
+
+// add the landmarks to the table:
+const bodyTable = document.getElementById("landmark-table")
+function renderTable() {
+    if (!bodyTable) return;
+    bodyTable.innerHTML = ""
+
+    landmarks.forEach((item, index) => {
+        const row = document.createElement("tr")
+        row.innerHTML = `
+    <td>${item.id}</td>
+    <td>${item.destination}</td>
+    <td>${item.name}</td>
+    <td>${item.description}</td>
+    <td><img src="${item.image}" alt="landmark image" width=50px height=50px ></td>
+
+    <td><button class="btn btn-danger deleteBtn" data-bs-toggle="modal" data-bs-target="#deleteLandmarkModal" data-index="${index}"><i class="bi bi-trash-fill"></i></button>
+        <button class="btn btn-warning editBtn"  data-bs-toggle="modal" data-bs-target="#EditForm" data-index="${index}"><i class="bi bi-pencil-square"></i></button>
+        </td>
+    `
+        bodyTable.appendChild(row)
+    })
+}
+if (bodyTable) renderTable()
+>>>>>>> origin/frontend
 
 // delete landmark
 let deleteIndex = null;
 
-const deleteModal = document.getElementById("deletModal")
+const deleteModal = document.getElementById("deleteLandmarkModal")
+if (deleteModal) {
+    deleteModal.addEventListener("show.bs.modal", function (event) {
+        const button = event.relatedTarget
+        deleteIndex = button.getAttribute("data-index")
+    })
+}
 
-deleteModal.addEventListener("show.bs.modal", function (event) {
+function showToast(message, type = "success") {
+    const toastEl = document.getElementById("deleteToast")
+    if (!toastEl) return
 
-    const button = event.relatedTarget
+    toastEl.querySelector(".toast-body").textContent = message
+    toastEl.classList.remove("text-bg-success", "text-bg-danger", "text-bg-warning")
+    toastEl.classList.add(`text-bg-${type}`)
 
+<<<<<<< HEAD
     deleteId = button.getAttribute("data-id")
 
 })
@@ -127,3 +274,105 @@ document.getElementById("confirmDelete").addEventListener("click", function(){
     }
 
 })
+=======
+    const toast = bootstrap.Toast.getOrCreateInstance(toastEl)
+    toast.show()
+}
+
+const confirmDeleteButton = document.getElementById("confirmDeleteLandmark")
+if (confirmDeleteButton && deleteModal) {
+    confirmDeleteButton.addEventListener("click", function () {
+        if (deleteIndex !== null) {
+            landmarks.splice(deleteIndex, 1)
+            renderTable()
+            const modal = bootstrap.Modal.getInstance(deleteModal)
+            modal.hide()
+            showToast("Landmark deleted successfully.", "success")
+        }
+    })
+}
+
+// add the users to the table:
+const tabbody = document.getElementById("user-table")
+function renderTable2() {
+    if (!tabbody) return;
+    tabbody.innerHTML = ""
+
+    users.forEach((item, index) => {
+        const row = document.createElement("tr")
+        row.innerHTML = `
+    <td>${item.id}</td>
+    <td>${item.username}</td>
+    <td>${item.name}</td>
+    <td>${item.email}</td>
+    <td>${item.accounttype}</td>
+    <td>${item.status}</td>
+    <td><button class="btn btn-danger deleteBtn" data-bs-toggle="modal" data-bs-target="#deleteUserModal" data-index="${index}"><i class="bi bi-trash-fill"></i></button>
+                        <button class="btn btn-warning disableBtn" data-bs-toggle="modal" data-bs-target="#disableModal" data-index="${index}">Disable</button>
+        </td>
+    `
+        tabbody.appendChild(row)
+    })
+}
+if (tabbody) renderTable2()
+
+// delete user
+let deleteuser = null;
+
+const deleteUserModal = document.getElementById("deleteUserModal")
+if (deleteUserModal) {
+    deleteUserModal.addEventListener("show.bs.modal", function (event) {
+        const button = event.relatedTarget
+        deleteuser = button.getAttribute("data-index")
+    })
+}
+
+const confirmDeleteuser = document.getElementById("confirmDeleteUser")
+if (confirmDeleteuser && deleteUserModal) {
+    confirmDeleteuser.addEventListener("click", function () {
+        if (deleteuser !== null) {
+            users.splice(deleteuser, 1)
+            renderTable2()
+            const modal = bootstrap.Modal.getInstance(deleteUserModal)
+            modal.hide()
+            showToast("User deleted successfully.", "success")
+        }
+    })
+}
+
+// Search/Filter functionality for landmarks
+const landmarkSearchInput = document.getElementById("landmarkSearchInput")
+if (landmarkSearchInput) {
+    landmarkSearchInput.addEventListener("keyup", function () {
+        const searchText = this.value.toLowerCase()
+        const tableRows = document.querySelectorAll("#landmark-table tr")
+        
+        tableRows.forEach(row => {
+            const rowText = row.innerText.toLowerCase()
+            if (rowText.includes(searchText)) {
+                row.style.display = ""
+            } else {
+                row.style.display = "none"
+            }
+        })
+    })
+}
+
+// Search/Filter functionality for users
+const userSearchInput = document.getElementById("userSearchInput")
+if (userSearchInput) {
+    userSearchInput.addEventListener("keyup", function () {
+        const searchText = this.value.toLowerCase()
+        const tableRows = document.querySelectorAll("#user-table tr")
+        
+        tableRows.forEach(row => {
+            const rowText = row.innerText.toLowerCase()
+            if (rowText.includes(searchText)) {
+                row.style.display = ""
+            } else {
+                row.style.display = "none"
+            }
+        })
+    })
+}
+>>>>>>> origin/frontend

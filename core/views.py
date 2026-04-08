@@ -37,7 +37,7 @@ def explore(request):
     })
 def exploreResult(request):
     query = request.GET.get('q', '') #the one we used as name
-
+    
     landmark = None
     top_landmarks = []
     related_landmarks = [] # it will be by reigon since we have reigon filter
@@ -112,13 +112,33 @@ def profile(request):
     # this is for editing the user display name/first name
     if request.method == "POST":
         first_name = request.POST.get("first_name")
+        username = request.POST.get("username")
+        email = request.POST.get("email")
+
+
+        # to check if username exists
+        if username and User.objects.exclude(id=user.id).filter(username=username).exists():
+            messages.error(request, "Username already exists.")
+            return redirect('profile')
+
+        # to check if email exist
+        if email and User.objects.exclude(id=user.id).filter(email=email).exists():
+            messages.error(request, "Email already exists.")
+            return redirect('profile')
+
+        #if they are not repeated, update them
         if first_name:
             user.first_name = first_name
-            user.save()
+        if username:
+            user.username = username
+        if email:
+            user.email = email
+        user.save()
+        messages.success(request, "Profile updated successfully!")
         return redirect('profile')
     
     context = {
-        'favorites': [f.landmark for f in favorites],  # only the Landmark objects
+        'favorites': [f.landmark for f in favorites],
         'user_stories': user_stories_unique,
     }
     return render(request, 'frontend/profile.html', context)
@@ -202,20 +222,58 @@ def toggle_favorite(request, landmark_id):
 #admin dashboard:
 @login_required
 def dashboard(request):
+    users_count = User.objects.count()
+    landmarks_count = Landmark.objects.count()
+    comments_count = Story.objects.count()
+    image_ops_count = 0  # temproraly
+    failed_ops_count = 0  # temproraly
+
+
+
+    #landmark % based on reigon
+    landmarks_by_dest = Landmark.objects.values('Destination').annotate(count=Count('id')).order_by('-count')
+    destinations = [item['Destination'] for item in landmarks_by_dest]
+    dest_counts = [item['count'] for item in landmarks_by_dest]
+
     context = {
         'users_count': User.objects.count(),
         'landmarks_count': Landmark.objects.count(),
         'comments_count': Story.objects.count(),
+        'image_ops_count': image_ops_count,
+        'failed_ops_count': failed_ops_count,
+        'destinations': destinations,
+        'dest_counts': dest_counts,
     }
     return render(request, 'adminDashboard/dashboard.html', context)
+
 @login_required
 def landmarks(request):
     landmarks = Landmark.objects.all()
     return render(request, 'adminDashboard/landmarks.html', {'landmarks': landmarks})
 @login_required
 def delete_landmark(request, landmark_id):
-    landmark = get_object_or_404(Landmark, id=landmark_id)
-    landmark.delete()
+    if request.method == "POST":
+        landmark = get_object_or_404(Landmark, id=landmark_id)
+        landmark.delete()
+        messages.success(request, "Landmark deleted successfully!")
+    return redirect('landmarks')
+@login_required
+def add_landmark(request):
+    if request.method == "POST":
+        destination = request.POST.get("Destination")
+        name = request.POST.get("Landmark_Name")
+        description = request.POST.get("Description")
+        image_url = request.POST.get("Image_Url")
+
+        Landmark.objects.create(
+            Destination=destination,
+            Landmark_Name=name,
+            Description=description,
+            Image_Url=image_url
+        )
+        messages.success(request, "Landmark added successfully!")
+        
+        return redirect('landmarks')
     return redirect('landmarks')
 @login_required
 def accountMange(request):
