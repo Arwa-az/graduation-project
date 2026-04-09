@@ -696,6 +696,8 @@ a {
     width: 180px;
     display: none;
     z-index: 20;
+    max-height: 200px;
+    overflow-y: scroll;
 }
 
 .options-list .option {
