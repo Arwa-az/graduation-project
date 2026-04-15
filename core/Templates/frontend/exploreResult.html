@@ -4,9 +4,10 @@
 {% block content %}
 <!-- found result -->
 <section class="explore-results fade-in">
+    
+    {% if landmark %}
     <h4>Searching Results for "{{ query }}"</h4>
     <hr> <!-- line -->
-    {% if landmark %}
     <div class="results-list">
         <div class="results-row d-flex flex-wrap">
             <div class="result-card">
@@ -23,7 +24,9 @@
         </div>
     </div>
     {% elif top_landmarks %}
-    <h4>Search Results</h4>
+    <h4>No results found</h4>
+    <p>But don't worry! Here are the closest landmarks to your search</p>
+    <hr> <!-- line -->
     <div class="results-list">
         <div class="results-row d-flex flex-wrap">
             {% for l in top_landmarks %}
@@ -43,9 +46,9 @@
     </div>
     {% else %}
     <!-- not found result page -->
-    <p>Sorry there is no result</p>
-    <hr> <!-- line -->
+    <p>No results found for "{{ query }}"</p>
     <h4>Related Places</h4>
+    <hr> <!-- line -->
     <div class="results-list">
         <div class="results-row d-flex flex-wrap">
             {% for l in related_landmarks %}
@@ -55,6 +58,8 @@
                     <div class="card-body">
                         <h5 class="card-title">{{ l.Landmark_Name }}</h5>
                         <a href="{% url 'infoPlace' l.id %}">
+                            <button class="view-btn">View</button>
+                        </a>
 </section>
 <section class="explore-results fade-in">
     <hr> <!-- line -->

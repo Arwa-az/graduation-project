@@ -894,7 +894,6 @@ a {
   background-color: var(--bg-secondary);
   align-items: center;
   justify-content: center;
-  background-color: #EBDEC1;
   border: none;
   border-radius: 15px;
   height: auto;
@@ -940,9 +939,6 @@ a {
 .explore-results .view-btn {
   background-color: var(--primary);
   color: var(--bg-secondary);
-  margin: 8px 16px;
-  background-color: #0B5D3B;
-  color: #EBDEC1;
   margin: 8px auto 16px;
   padding: 8px 24px;
   border: none;
