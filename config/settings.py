@@ -15,7 +15,6 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
@@ -30,8 +29,14 @@ ALLOWED_HOSTS = ['192.168.86.248', '127.0.0.1', 'localhost']
 #for proper logout
 LOGOUT_REDIRECT_URL = '/'
 
-#for password reseting (works on console right now, will edit it to send real Emails later)
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+#for password reseting (using Gmail SMTP)
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'sauditales0@gmail.com'
+EMAIL_HOST_PASSWORD = 'sfic nuuk xdph gojv'
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # Application definition
 
