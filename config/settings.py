@@ -29,6 +29,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['192.168.86.248', '127.0.0.1', 'localhost', '*']
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://graduation-project-production-cf17.up.railway.app",
+    "https://*.up.railway.app"
+]
+
 #for proper logout
 LOGOUT_REDIRECT_URL = '/'
 
