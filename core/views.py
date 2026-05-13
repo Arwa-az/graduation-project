@@ -31,7 +31,7 @@ def home(request):
         popularity_score=F('likes_count') + 0.5 * F('comments_count')
     ).order_by('-popularity_score')[:3]
 
-    return render(request, 'frontend/home.html', {
+    return render(request, 'Templates/frontend/home.html', {
         'popular_landmarks': popular_landmarks,
     })
 def explore(request):
