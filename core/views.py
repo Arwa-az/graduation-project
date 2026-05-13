@@ -549,10 +549,24 @@ def add_user(request):
 
     return redirect('AccountManagement')
 # for download the MobileNet module once when running the server
-base_model = tf.keras.applications.MobileNetV2(weights='imagenet', include_top=False, pooling='avg')
+# base_model = tf.keras.applications.MobileNetV2(weights='imagenet', include_top=False, pooling='avg')
 # Download the features from landmark_features.pkl file 
 MODEL_PATH = os.path.join(os.path.dirname(__file__), 'ml_model', 'landmark_features.pkl')
 landmark_features = joblib.load(MODEL_PATH)
+
+base_model = None
+
+def get_model():
+    global base_model
+
+    if base_model is None:
+        base_model = tf.keras.applications.MobileNetV2(
+            weights='imagenet',
+            include_top=False,
+            pooling='avg'
+        )
+
+    return base_model
 
 # AI Landmark Recognition Model
 def predict_landmark(request):
@@ -583,8 +597,10 @@ def predict_landmark(request):
             img_array = np.expand_dims(img_array, axis=0)
             img_array = preprocess_input(img_array)
 
+
+            model = get_model()
             # 2️ Feature extraction
-            query_feature = base_model.predict(img_array, verbose=0).flatten()
+            query_feature = model.predict(img_array, verbose=0).flatten()
             query_feature = normalize([query_feature])[0]
 
             # 3️ Calculate the highest similarity for each landmark
