@@ -35,7 +35,7 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 
-LOGIN_REDIRECT_URL = '/login/'
+LOGIN_URL = '/login/'
 #for proper logout
 LOGOUT_REDIRECT_URL = '/'
 
