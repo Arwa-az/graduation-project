@@ -301,7 +301,7 @@ def logout_view(request):
     auth_logout(request)
     return redirect("home")
 
-@login_required
+# @login_required
 def toggle_favorite(request, landmark_id):
     if not request.user.is_authenticated:
          messages.error(request, "You must login first to add favorites.")
