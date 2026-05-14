@@ -301,12 +301,8 @@ def logout_view(request):
     auth_logout(request)
     return redirect("home")
 
-# @login_required
+@login_required
 def toggle_favorite(request, landmark_id):
-    if not request.user.is_authenticated:
-         messages.error(request, "You must login first to add favorites.")
-         return redirect(request.META.get('HTTP_REFERER', '/'))
-    
     landmark = get_object_or_404(Landmark, id=landmark_id)
     favorite_obj = Favorite.objects.filter(user=request.user, landmark=landmark).first()
 

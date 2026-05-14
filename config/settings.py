@@ -34,6 +34,8 @@ CSRF_TRUSTED_ORIGINS = [
     "https://*.up.railway.app"
 ]
 
+
+LOGIN_REDIRECT_URL = '/login/'
 #for proper logout
 LOGOUT_REDIRECT_URL = '/'
 
